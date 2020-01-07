@@ -1,11 +1,38 @@
 Bolt [![Coverage Status](https://coveralls.io/repos/boltdb/bolt/badge.svg?branch=master)](https://coveralls.io/r/boltdb/bolt?branch=master) [![GoDoc](https://godoc.org/github.com/boltdb/bolt?status.svg)](https://godoc.org/github.com/boltdb/bolt) ![Version](https://img.shields.io/badge/version-1.2.1-green.svg)
 ====
 
-bigboltdb
+Extended BigBoltDB
 -------
 
-Bigboltdb is a fork of boltdb that supports database
-compaction and thus can store big values (over 1MB).
+Extended BigboltDB is a fork of BigBoltDB that supports database
+compaction and thus can store big values (over 1MB)
+and support limit and range functions.
+
+Two new functions in Extended BigBoltDB:
+
+GetLimit([]byte(key), uint32)
+GetRange([]byte(key), uint32, uint32)
+
+Example:
+
+```limit := uint32(1048576)
+start := uint32(1048576)
+end := uint32(2097152)
+
+GetLimit([]byte(key), limit)
+GetRange([]byte(key), start, end)```
+
+Where limit, start, end - this is a count of bytes.
+
+This functions need for partly reading values.
+
+For example, if you have some files with custom binary metadata inside values in boltdb,
+or if you need make support of Accept-Ranges for http server with backends in boltdb files,
+then you can save hdd/ssd reads by make read only small parts of value(metadata or range of bytes),
+not read full value.
+
+BigBoltDB
+-------
 
 Writing big values causes fragmententation of
 the backing file, requiring regular compaction to avoid
@@ -29,7 +56,7 @@ discussion.
 
 Now back to your regularly scheduled README... See also https://github.com/boltdb/bolt.
 
-boltdb
+BoltDB
 ------
 
 Bolt is a pure Go key/value store inspired by [Howard Chu's][hyc_symas]

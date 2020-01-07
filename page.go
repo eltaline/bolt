@@ -7,6 +7,9 @@ import (
 	"unsafe"
 )
 
+var lmbytes uint32 = 0
+var smbytes uint32 = 0
+
 const pageHeaderSize = int(unsafe.Offsetof(((*page)(nil)).ptr))
 
 const minKeysPerPage = 2
@@ -57,6 +60,21 @@ func (p *page) meta() *meta {
 // leafPageElement retrieves the leaf node by index
 func (p *page) leafPageElement(index uint16) *leafPageElement {
 	n := &((*[0x7FFFFFF]leafPageElement)(unsafe.Pointer(&p.ptr)))[index]
+	return n
+}
+
+// leafPageElementLimit retrieves the leaf node by index
+func (p *page) leafPageElementLimit(index uint16, lbytes uint32) (*leafPageElementLimit) {
+	n := &((*[0x7FFFFFF]leafPageElementLimit)(unsafe.Pointer(&p.ptr)))[index]
+	lmbytes = lbytes
+	return n
+}
+
+// leafPageElementRange retrieves the leaf node by index
+func (p *page) leafPageElementRange(index uint16, sbytes uint32, lbytes uint32) (*leafPageElementRange) {
+	n := &((*[0x7FFFFFF]leafPageElementRange)(unsafe.Pointer(&p.ptr)))[index]
+	lmbytes = lbytes
+	smbytes = sbytes
 	return n
 }
 
@@ -114,8 +132,38 @@ type leafPageElement struct {
 	vsize uint32
 }
 
+// leafPageElementLimit represents a node on a leaf page.
+type leafPageElementLimit struct {
+	flags  uint32
+	pos    uint32
+	ksize  uint32
+	vsize  uint32
+}
+
+// leafPageElementRange represents a node on a leaf page.
+type leafPageElementRange struct {
+	flags  uint32
+	pos    uint32
+	ksize  uint32
+	vsize  uint32
+}
+
 // key returns a byte slice of the node key.
 func (n *leafPageElement) key() []byte {
+	buf := (*[maxAllocSize]byte)(unsafe.Pointer(n))
+	return (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos]))[:n.ksize:n.ksize]
+}
+
+// key returns a byte slice of the node key.
+
+func (n *leafPageElementLimit) key() []byte {
+	buf := (*[maxAllocSize]byte)(unsafe.Pointer(n))
+	return (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos]))[:n.ksize:n.ksize]
+}
+
+// key returns a byte slice of the node key.
+
+func (n *leafPageElementRange) key() []byte {
 	buf := (*[maxAllocSize]byte)(unsafe.Pointer(n))
 	return (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos]))[:n.ksize:n.ksize]
 }
@@ -124,6 +172,32 @@ func (n *leafPageElement) key() []byte {
 func (n *leafPageElement) value() []byte {
 	buf := (*[maxAllocSize]byte)(unsafe.Pointer(n))
 	return (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize]))[:n.vsize:n.vsize]
+}
+
+// value returns a byte slice of the node value limited by bytes count.
+func (n *leafPageElementLimit) value() []byte {
+	buf := (*[maxAllocSize]byte)(unsafe.Pointer(n))
+
+	if lmbytes > n.vsize {
+		lmbytes = n.vsize
+	}
+
+	return (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize]))[:lmbytes:lmbytes]
+}
+
+// value returns a byte slice of the node value limited by bytes range.
+func (n *leafPageElementRange) value() []byte {
+	buf := (*[maxAllocSize]byte)(unsafe.Pointer(n))
+
+	if smbytes >= n.vsize {
+		smbytes = 0
+	}
+
+	if lmbytes > n.vsize {
+		lmbytes = n.vsize
+	}
+
+	return (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize+smbytes]))[:lmbytes:lmbytes]
 }
 
 // PageInfo represents human readable information about a page.
