@@ -4,7 +4,7 @@ Bolt [![Coverage Status](https://coveralls.io/repos/boltdb/bolt/badge.svg?branch
 Extended BigBoltDB
 -------
 
-Extended BigboltDB is a fork of BigBoltDB that supports database
+Extended BigBoltDB is a fork of BigBoltDB that supports database
 compaction and thus can store big values (over 1MB)
 and support limit and range functions.
 
@@ -20,7 +20,8 @@ start := uint32(1048576)
 end := uint32(2097152)
 
 GetLimit([]byte(key), limit)
-GetRange([]byte(key), start, end)```
+GetRange([]byte(key), start, end)
+```
 
 Where limit, start, end - this is a count of bytes.
 
@@ -36,20 +37,20 @@ BigBoltDB
 
 Writing big values causes fragmententation of
 the backing file, requiring regular compaction to avoid
-infinite file growth. Bigboltdb provides a Compact() api
+infinite file growth. BigBoltDB provides a Compact() api
 call to do this, and a mechanism to establish regular,
 automatic compaction by setting the `db.CompactAfterCommitCount`
 field. 
 
-Other than this one change, bigboltdb is simple, friendly fork
-of boltdb.
+Other than this one change, BigBoltDB is simple, friendly fork
+of BoltDB.
 
 We intend stay completely compatable and to
 maintain 100% compatibility with upstream by merging any
 updates.
 
 This fork was required because the author of
-boltdb, sadly, does not wish to support compaction within boltdb.
+BoldDB, sadly, does not wish to support compaction within boltdb.
 Refer to https://github.com/boltdb/bolt/issues/674 and
 https://github.com/boltdb/bolt/pull/679 for the
 discussion.
