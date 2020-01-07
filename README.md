@@ -8,9 +8,11 @@ Extended BigBoltDB is a fork of BigBoltDB that supports database
 compaction and thus can store big values (over 1MB)
 and support limit and range functions.
 
-Two new functions in Extended BigBoltDB:
+Three new functions in Extended BigBoltDB:
 
 GetLimit([]byte(key), uint32)
+
+GetOffset([]byte(key), uint32)
 
 GetRange([]byte(key), uint32, uint32)
 
@@ -20,14 +22,16 @@ Example:
 key := "mykey"
 
 limit := uint32(1048576)
+offset: = uint32(131072)
 start := uint32(1048576)
 end := uint32(2097152)
 
 GetLimit([]byte(key), limit)
+GetOffset([]byte(key), offset)
 GetRange([]byte(key), start, end)
 ```
 
-Where limit, start, end - this is a count of bytes.
+Where limit, offset, start, end - this is a count of bytes.
 
 This functions need for partly reading values.
 

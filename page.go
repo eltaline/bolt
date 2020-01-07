@@ -9,6 +9,7 @@ import (
 
 var lmbytes uint32 = 0
 var smbytes uint32 = 0
+var ombytes uint32 = 0
 
 const pageHeaderSize = int(unsafe.Offsetof(((*page)(nil)).ptr))
 
@@ -67,6 +68,13 @@ func (p *page) leafPageElement(index uint16) *leafPageElement {
 func (p *page) leafPageElementLimit(index uint16, lbytes uint32) (*leafPageElementLimit) {
 	n := &((*[0x7FFFFFF]leafPageElementLimit)(unsafe.Pointer(&p.ptr)))[index]
 	lmbytes = lbytes
+	return n
+}
+
+// leafPageElementOffset retrieves the leaf node by index
+func (p *page) leafPageElementOffset(index uint16, obytes uint32) (*leafPageElementOffset) {
+	n := &((*[0x7FFFFFF]leafPageElementOffset)(unsafe.Pointer(&p.ptr)))[index]
+	ombytes = obytes
 	return n
 }
 
@@ -140,6 +148,14 @@ type leafPageElementLimit struct {
 	vsize  uint32
 }
 
+// leafPageElementOffset represents a node on a leaf page.
+type leafPageElementOffset struct {
+	flags  uint32
+	pos    uint32
+	ksize  uint32
+	vsize  uint32
+}
+
 // leafPageElementRange represents a node on a leaf page.
 type leafPageElementRange struct {
 	flags  uint32
@@ -157,6 +173,13 @@ func (n *leafPageElement) key() []byte {
 // key returns a byte slice of the node key.
 
 func (n *leafPageElementLimit) key() []byte {
+	buf := (*[maxAllocSize]byte)(unsafe.Pointer(n))
+	return (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos]))[:n.ksize:n.ksize]
+}
+
+// key returns a byte slice of the node key.
+
+func (n *leafPageElementOffset) key() []byte {
 	buf := (*[maxAllocSize]byte)(unsafe.Pointer(n))
 	return (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos]))[:n.ksize:n.ksize]
 }
@@ -183,6 +206,17 @@ func (n *leafPageElementLimit) value() []byte {
 	}
 
 	return (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize]))[:lmbytes:lmbytes]
+}
+
+// value returns a byte slice of the node value with skipped bytes count.
+func (n *leafPageElementOffset) value() []byte {
+	buf := (*[maxAllocSize]byte)(unsafe.Pointer(n))
+
+	if ombytes >= n.vsize {
+		ombytes = 0
+	}
+
+	return (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize+ombytes]))[:n.vsize:n.vsize]
 }
 
 // value returns a byte slice of the node value limited by bytes range.

@@ -187,6 +187,25 @@ func (c *Cursor) seeklimit(seek []byte, lbytes uint32) (key []byte, value []byte
 	return c.keyValueLimit(lbytes)
 }
 
+// seekoffset moves the cursor to a given key and returns it.
+// If the key does not exist then the next key is used.
+func (c *Cursor) seekoffset(seek []byte, obytes uint32) (key []byte, value []byte, flags uint32) {
+	_assert(c.bucket.tx.db != nil, "tx closed")
+
+	// Start from root page/node and traverse to correct page.
+	c.stack = c.stack[:0]
+	c.search(seek, c.bucket.root)
+	ref := &c.stack[len(c.stack)-1]
+
+	// If the cursor is pointing to the end of page/node then return nil.
+	if ref.index >= ref.count() {
+		return nil, nil, 0
+	}
+
+	// If this is a bucket then return a nil value.
+	return c.keyValueOffset(obytes)
+}
+
 // seekrange moves the cursor to a given key and returns it.
 // If the key does not exist then the next key is used.
 func (c *Cursor) seekrange(seek []byte, sbytes uint32, lbytes uint32) (key []byte, value []byte, flags uint32) {
@@ -407,6 +426,24 @@ func (c *Cursor) keyValueLimit(lbytes uint32) ([]byte, []byte, uint32) {
 
 	// Or retrieve value from page.
 	elem := ref.page.leafPageElementLimit(uint16(ref.index), lbytes)
+	return elem.key(), elem.value(), elem.flags
+}
+
+// keyValueOffset returns the key and value of the current leaf element with skipped bytes count.
+func (c *Cursor) keyValueOffset(obytes uint32) ([]byte, []byte, uint32) {
+	ref := &c.stack[len(c.stack)-1]
+	if ref.count() == 0 || ref.index >= ref.count() {
+		return nil, nil, 0
+	}
+
+	// Retrieve value from node.
+	if ref.node != nil {
+		inode := &ref.node.inodes[ref.index]
+		return inode.key, inode.value, inode.flags
+	}
+
+	// Or retrieve value from page.
+	elem := ref.page.leafPageElementOffset(uint16(ref.index), obytes)
 	return elem.key(), elem.value(), elem.flags
 }
 

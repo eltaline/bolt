@@ -296,6 +296,24 @@ func (b *Bucket) GetLimit(key []byte, lbytes uint32) []byte {
 	return v
 }
 
+// GetOffset retrieves the value for a key in the bucket with skipped bytes count.
+// Returns a nil value if the key does not exist or if the key is a nested bucket.
+// The returned value is only valid for the life of the transaction.
+func (b *Bucket) GetOffset(key []byte, obytes uint32) []byte {
+	k, v, flags := b.Cursor().seekoffset(key, obytes)
+
+	// Return nil if this is a bucket.
+	if (flags & bucketLeafFlag) != 0 {
+		return nil
+	}
+
+	// If our target node isn't the same key as what's passed in then return nil.
+	if !bytes.Equal(key, k) {
+		return nil
+	}
+	return v
+}
+
 // GetRange retrieves the value for a key in the bucket limited by bytes range.
 // Returns a nil value if the key does not exist or if the key is a nested bucket.
 // The returned value is only valid for the life of the transaction.
