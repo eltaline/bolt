@@ -216,7 +216,9 @@ func (n *leafPageElementOffset) value() []byte {
 		ombytes = 0
 	}
 
-	return (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize+ombytes]))[:n.vsize:n.vsize]
+	embytes := n.vsize - ombyte
+
+	return (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize+ombytes]))[:embytes:embytes]
 }
 
 // value returns a byte slice of the node value limited by bytes range.
