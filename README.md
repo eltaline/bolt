@@ -6,7 +6,7 @@ Extended BigBoltDB
 
 Extended BigBoltDB is a fork of BigBoltDB that supports database
 compaction and thus can store big values (over 1MB)
-and support limit and range functions.
+and support limit, offset and range functions.
 
 Three new functions in Extended BigBoltDB:
 
