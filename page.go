@@ -216,7 +216,7 @@ func (n *leafPageElementOffset) value() []byte {
 		ombytes = 0
 	}
 
-	embytes := n.vsize - ombyte
+	embytes := n.vsize - ombytes
 
 	return (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize+ombytes]))[:embytes:embytes]
 }
