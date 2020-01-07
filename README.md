@@ -11,6 +11,7 @@ and support limit and range functions.
 Two new functions in Extended BigBoltDB:
 
 GetLimit([]byte(key), uint32)
+
 GetRange([]byte(key), uint32, uint32)
 
 Example:
