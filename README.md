@@ -16,7 +16,10 @@ GetRange([]byte(key), uint32, uint32)
 
 Example:
 
-```limit := uint32(1048576)
+```
+key := "mykey"
+
+limit := uint32(1048576)
 start := uint32(1048576)
 end := uint32(2097152)
 
