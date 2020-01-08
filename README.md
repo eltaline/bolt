@@ -36,9 +36,7 @@ Where limit, offset, start, end - this is a count of bytes.
 This functions need for partly reading values.
 
 For example, if you have some files with custom binary metadata inside values in boltdb,
-or if you need make support of Accept-Ranges for http server with backends in boltdb files,
-then you can save hdd/ssd reads by make read only small parts of value(metadata or range of bytes),
-not read full value.
+and if you need make support of HEAD/OPTIONS methods for read only metadata or Accept-Ranges for http server with backends in boltdb files, then you can dramatically save subsystem hdd/ssd by make read only small parts of value(metadata or range of bytes), and not read a full value of key from boltdb.
 
 BigBoltDB
 -------
