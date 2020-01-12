@@ -1,6 +1,6 @@
 // +build aix
 
-package bbolt
+package bolt
 
 import (
 	"fmt"

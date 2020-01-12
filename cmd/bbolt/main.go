@@ -18,8 +18,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 	"unsafe"
-
-	bolt "go.etcd.io/bbolt"
+	"github.com/eltaline/bolt"
 )
 
 var (
