@@ -1005,7 +1005,6 @@ func (db *DB) IsReadOnly() bool {
 	return db.readOnly
 }
 
-<<<<<<< HEAD
 // auto-compaction feature
 func (db *DB) onCommitCompactionCheck() error {
 
