@@ -1,4 +1,4 @@
-package bolt_test
+package bbolt_test
 
 import (
 	"bytes"
@@ -10,8 +10,7 @@ import (
 	"sort"
 	"testing"
 	"testing/quick"
-
-	"github.com/bigboltdb/bolt"
+	"github.com/eltaline/bolt"
 )
 
 // Ensure that a cursor can return a reference to the bucket that created it.

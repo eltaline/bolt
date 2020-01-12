@@ -1,4 +1,4 @@
-// +build ppc64
+// +build riscv64
 
 package bbolt
 
@@ -9,4 +9,4 @@ const maxMapSize = 0xFFFFFFFFFFFF // 256TB
 const maxAllocSize = 0x7FFFFFFF
 
 // Are unaligned load/stores broken on this arch?
-var brokenUnaligned = false
+var brokenUnaligned = true
