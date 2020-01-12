@@ -1,3 +1,3 @@
-module go.etcd.io/bbolt
+module github.com/eltaline/bolt
 
-go 1.12
+go 1.13
