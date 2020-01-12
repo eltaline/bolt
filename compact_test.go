@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"os"
 	"testing"
-
-	"github.com/bigboltdb/bolt"
+	"github.com/eltaline/bolt"
 )
 
 func TestCompact(t *testing.T) {
