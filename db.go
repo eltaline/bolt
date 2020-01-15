@@ -1129,7 +1129,7 @@ type Options struct {
 var DefaultOptions = &Options{
 	Timeout:      0,
 	NoGrowSync:   false,
-	FreelistType: FreelistMapType,
+	FreelistType: FreelistArrayType,
 }
 
 // Stats represents statistics about the database.
