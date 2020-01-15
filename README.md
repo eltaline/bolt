@@ -7,8 +7,6 @@ Eltaline Bolt is a merged fork of <a href=https://github.com/glycerine/bigbolt>b
  - Support limit, offset and range functions from eltaline bolt.
  - Included last fixes from bbolt.
 
- - Freelist Map (hashmap) activated by default
-
 Three new functions in Eltaline Bolt:
 
 GetLimit([]byte(key), uint32)
